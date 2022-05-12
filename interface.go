@@ -1,8 +1,6 @@
-package corn
+package cron
 
 import (
-	"fmt"
-
 	. "github.com/chefsgo/base"
 	"github.com/robfig/cron/v3"
 )
@@ -57,7 +55,7 @@ func (this *Module) Initialize() {
 	this.filterActions = make([]ctxFunc, 0)
 	for _, filter := range this.filters {
 		if filter.Action != nil {
-			this.filterActions = append(this.filterActions, filter.Request)
+			this.filterActions = append(this.filterActions, filter.Action)
 		}
 	}
 
@@ -68,32 +66,33 @@ func (this *Module) Connect() {
 		return
 	}
 
-	this.cron = cron.New()
-	this.cronEntries = make(map[string][]string, 0)
+	this.cron = cron.New(cron.WithParser(cron.NewParser(
+		cron.SecondOptional | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor,
+	)))
+	// this.cronEntries = make(map[string][]string, 0)
 
 	inst := &Instance{
 		this,
 	}
 
-	for key, val := range this.jobTimes {
+	for key, times := range this.jobTimes {
 		name := key
-		config := val
 
-		ids := make([]string, 0)
-		for i, crontab := range config.Times {
-			timeName := fmt.Sprintf("%s.%v", key, i)
-			id, err := this.cron.AddFunc(crontab, func() {
-				inst.Serve(name, config)
-			}, &cron.Extra{Name: timeName, RunForce: false, TimeOut: 5})
+		// ids := make([]string, 0)
+		for _, crontab := range times {
+			// timeName := fmt.Sprintf("%s.%v", key, i)
+			_, err := this.cron.AddFunc(crontab, func() {
+				inst.Serve(name)
+			})
 
 			if err != nil {
-				panic("[plan]注册计划失败")
+				panic("[plan]注册计划失败：" + err.Error())
 			}
 
-			ids = append(ids, id)
+			// ids = append(ids, id)
 		}
 
-		this.cronEntries[name] = ids
+		// this.cronEntries[name] = ids
 	}
 
 	this.instance = inst

@@ -1,4 +1,4 @@
-package corn
+package cron
 
 import (
 	. "github.com/chefsgo/base"
@@ -27,10 +27,10 @@ type (
 
 func (this *Module) Job(name string, config Job, override bool) {
 	if override {
-		this.handlers[name] = config
+		this.jobs[name] = config
 	} else {
-		if _, ok := this.handlers[name]; ok == false {
-			this.handlers[name] = config
+		if _, ok := this.jobs[name]; ok == false {
+			this.jobs[name] = config
 		}
 	}
 }

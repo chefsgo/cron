@@ -1,12 +1,11 @@
-package corn
+package cron
 
 import (
-	. "github.com/chefsgo/base"
 	"github.com/chefsgo/chef"
 )
 
 func (this *Instance) Serve(name string) {
-	config, ok := this.module.corns[name]
+	config, ok := this.module.jobs[name]
 	if ok == false {
 		return
 	}

@@ -1,4 +1,4 @@
-package corn
+package cron
 
 import (
 	. "github.com/chefsgo/base"

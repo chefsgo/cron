@@ -1,4 +1,4 @@
-package corn
+package cron
 
 const (
 	NAME = "CRON"
